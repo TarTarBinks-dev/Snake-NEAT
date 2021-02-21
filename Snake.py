@@ -110,42 +110,56 @@ class FRUIT:
 		self.y = random.randint(0,cell_number - 1)
 		self.pos = Vector2(self.x,self.y)
 
-class MAIN:
-	def __init__(self):
-		self.snake = SNAKE()
-		self.fruit = FRUIT()
+pygame.mixer.pre_init(44100,-16,2,512)
+pygame.init()
+ge = []
+nets = []
+snakes = []
+fruits = []
+cell_size = 40
+cell_number = 20
+screen = pygame.display.set_mode((cell_number * cell_size,cell_number * cell_size))
+clock = pygame.time.Clock()
+apple = pygame.image.load('Graphics/apple.png').convert_alpha()
+game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
-	def update(self):
-		self.snake.move_snake()
-		self.check_collision()
-		self.check_fail()
+def eval_genomes(genomes, config):
+	def update(snake, fruit, i):
+		snake.move_snake()
+		check_collision(snake, fruit, i)
+		check_fail(snake, i)
 
-	def draw_elements(self):
-		self.draw_grass()
-		self.fruit.draw_fruit()
-		self.snake.draw_snake()
-		self.draw_score()
+	def draw_elements(snake, fruit):
+		draw_grass()
+		fruit.draw_fruit()
+		snake.draw_snake()
+		draw_score()
 
-	def check_collision(self):
-		if self.fruit.pos == self.snake.body[0]:
-			self.fruit.randomize()
-			self.snake.add_block()
-			self.snake.play_crunch_sound()
+	def check_collision(snake, fruit, i):
+		if fruit.pos == snake.body[0]:
+			fruit.randomize()
+			snake.add_block()
+			#snake.play_crunch_sound()
+			ge[i].fitness +=2
 
-		for block in self.snake.body[1:]:
-			if block == self.fruit.pos:
-				self.fruit.randomize()
+		for block in snake.body[1:]:
+			if block == fruit.pos:
+				fruit.randomize()
 
-	def check_fail(self):
-		if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
-			self.game_over()
+	def check_fail(snake, i):
+		if not 0 <= snake.body[0].x < cell_number or not 0 <= snake.body[0].y < cell_number:
+			ge[i].fitness -=1
+			game_over()
 
-		for block in self.snake.body[1:]:
-			if block == self.snake.body[0]:
-				self.game_over()
+		for block in snake.body[1:]:
+			if block == snake.body[0]:
+				ge[i].fitness -=1
+				game_over()
 		
-	def game_over(self):
-		self.snake.reset()
+	def game_over(snake, i):
+		snakes.pop(i)
+		ge.pop(i)
+		nets.pop(i)
 
 	def draw_grass(self):
 		grass_color = (167,209,61)
@@ -175,45 +189,47 @@ class MAIN:
 		screen.blit(apple,apple_rect)
 		pygame.draw.rect(screen,(56,74,12),bg_rect,2)
 
-pygame.mixer.pre_init(44100,-16,2,512)
-pygame.init()
-cell_size = 40
-cell_number = 20
-screen = pygame.display.set_mode((cell_number * cell_size,cell_number * cell_size))
-clock = pygame.time.Clock()
-apple = pygame.image.load('Graphics/apple.png').convert_alpha()
-game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+	SCREEN_UPDATE = pygame.USEREVENT
+	pygame.time.set_timer(SCREEN_UPDATE,150)
 
-SCREEN_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(SCREEN_UPDATE,150)
-
-main_game = MAIN()
-
-while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			pygame.quit()
-			sys.exit()
-		if event.type == SCREEN_UPDATE:
-			main_game.update()
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_UP:
-				if main_game.snake.direction.y != 1:
-					main_game.snake.direction = Vector2(0,-1)
-			if event.key == pygame.K_RIGHT:
-				if main_game.snake.direction.x != -1:
-					main_game.snake.direction = Vector2(1,0)
-			if event.key == pygame.K_DOWN:
-				if main_game.snake.direction.y != -1:
-					main_game.snake.direction = Vector2(0,1)
-			if event.key == pygame.K_LEFT:
-				if main_game.snake.direction.x != 1:
-					main_game.snake.direction = Vector2(-1,0)
-
-	screen.fill((175,215,70))
-	main_game.draw_elements()
-	pygame.display.update()
-	clock.tick(100)
+	for genome_id, genome in genomes:
+		snakes.append(SNAKE())
+		fruits.append(FRUIT())
+		ge.append(genome)
+		net = neat.nn.FeedForwardNetwork.create(genome, config)
+		nets.append(net)
+		genome.fitness = 0
+	
+	while True:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			if event.type == SCREEN_UPDATE:
+				update()
+			if len(snakes) == 0:
+				break
+			for i, snake in enumerate(snakes):
+				if event.type == SCREEN_UPDATE:
+					update(snake,  i)
+				output = net[i].activate(fruits(i).pos.x, fruits(i).pos.y)
+				if output[0] > 0.5:
+					if snake.direction.y != 1:
+						main_game.snake.direction = Vector2(0,-1)
+				if output[1] > 0.5:
+					if snake.direction.x != -1:
+						main_game.snake.direction = Vector2(1,0)
+				if output[2] > 0.5:
+					if snake.direction.y != -1:
+						main_game.snake.direction = Vector2(0,1)
+				if output[3] > 0.5:
+					if snake.direction.x != 1:
+						main_game.snake.direction = Vector2(-1,0)
+				draw_elements(snake, fruits(i))
+		screen.fill((175,215,70))
+		
+		pygame.display.update()
+		clock.tick(100)
 
 def run(config_path):
     global pop
