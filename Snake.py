@@ -38,7 +38,8 @@ class SNAKE():
                 self.foodx = round(random.randrange(0, dis_width - self.snake_block) / 10.0) * 10.0
                 self.foody = round(random.randrange(0, dis_height - self.snake_block) / 10.0) * 10.0
         def draw_fruit(self):
-                pygame.draw.rect(dis, green, [self.foodx, self.foody, self.snake_block, self.snake_block])
+                self.foodx = round(random.randrange(0, dis_width - self.snake_block) / 10.0) * 10.0
+                self.foody = round(random.randrange(0, dis_height - self.snake_block) / 10.0) * 10.0
             
         def our_snake(self):
                 for x in self.snake_List:
@@ -51,38 +52,38 @@ class SNAKE():
 def gameLoop():
         game_over = False
         game_close = False
-
+        
         snake = SNAKE()
-
+        snake.draw_fruit()
         while not game_over:
 
                 while game_close == True:
+                        pygame.display.update()
                         gameLoop()
-                
 
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                                 game_over = True
                         if event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_LEFT:
-                                        x1_change = -snake.snake_block
-                                        y1_change = 0
+                                        snake.x1_change = -snake.snake_block
+                                        snake.y1_change = 0
                                 elif event.key == pygame.K_RIGHT:
-                                        x1_change = snake.snake_block
-                                        y1_change = 0
+                                        snake.x1_change = snake.snake_block
+                                        snake.y1_change = 0
                                 elif event.key == pygame.K_UP:
-                                        y1_change = -snake.snake_block
-                                        x1_change = 0
+                                        snake.y1_change = -snake.snake_block
+                                        snake.x1_change = 0
                                 elif event.key == pygame.K_DOWN:
-                                        y1_change = snake.snake_block
-                                        x1_change = 0
+                                        snake.y1_change = snake.snake_block
+                                        snake.x1_change = 0
 
                 if snake.x1 >= dis_width or snake.x1 < 0 or snake.y1 >= dis_height or snake.y1 < 0:
                         game_close = True
-                snake.x1 += x1_change
-                snake.y1 += y1_change
+                snake.x1 += snake.x1_change
+                snake.y1 += snake.y1_change
                 dis.fill(blue)
-                snake.draw_fruit()
+                pygame.draw.rect(dis, green, [snake.foodx, snake.foody, snake.snake_block, snake.snake_block])
                 snake.snake_Head.append(snake.x1)
                 snake.snake_Head.append(snake.y1)
                 snake.snake_List.append(snake.snake_Head)
@@ -91,16 +92,13 @@ def gameLoop():
 
                 for x in snake.snake_List[:-1]:
                         if x == snake.snake_Head:
-                            game_close = True
+                                game_close = True
 
                 snake.our_snake()
-                snake.Your_score(snake.Length_of_snake - 1)
-
                 pygame.display.update()
 
                 if snake.x1 == snake.foodx and snake.y1 == snake.foody:
-                        snake.foodx = round(random.randrange(0, dis_width - snake.snake_block) / 10.0) * 10.0
-                        snake.foody = round(random.randrange(0, dis_height - snake.snake_block) / 10.0) * 10.0
+                        snake.draw_fruit()
                         snake.Length_of_snake += 1
 
                 clock.tick(snake_speed)
@@ -110,24 +108,3 @@ def gameLoop():
 
 
 gameLoop()
-
-
-
-def run(config_path):
-    global pop
-    config = neat.config.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_path
-    )
-
-    pop = neat.Population(config)
-    pop.run(eval_genomes, 10000000000)
-
-
-if __name__ == '__main__':
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config.txt')
-    run(config_path)
