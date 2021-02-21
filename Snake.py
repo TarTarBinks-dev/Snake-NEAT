@@ -114,8 +114,16 @@ pygame.mixer.pre_init(44100,-16,2,512)
 pygame.init()
 ge = []
 nets = []
-snakes = []
-fruits = []
+snake1 = SNAKE()
+snake2 = SNAKE()
+snake3 = SNAKE()
+snake4 = SNAKE()
+snake5 = SNAKE()
+fruit1 = FRUIT()
+fruit2 = FRUIT()
+fruit3 = FRUIT()
+fruit4 = FRUIT()
+fruit5 = FRUIT()
 cell_size = 40
 cell_number = 20
 screen = pygame.display.set_mode((cell_number * cell_size,cell_number * cell_size))
@@ -124,6 +132,12 @@ apple = pygame.image.load('Graphics/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
 def eval_genomes(genomes, config):
+	for genome_id, genome in genomes:
+		ge.append(genome)
+		net = neat.nn.FeedForwardNetwork.create(genome, config)
+		nets.append(net)
+		genome.fitness = 0
+		
 	def update(snake, fruit, i):
 		snake.move_snake()
 		check_collision(snake, fruit, i)
@@ -149,19 +163,28 @@ def eval_genomes(genomes, config):
 	def check_fail(snake, i):
 		if not 0 <= snake.body[0].x < cell_number or not 0 <= snake.body[0].y < cell_number:
 			ge[i].fitness -=1
-			game_over()
+			game_over(snake, i)
 
 		for block in snake.body[1:]:
 			if block == snake.body[0]:
 				ge[i].fitness -=1
-				game_over()
+				game_over(snake, i)
 		
 	def game_over(snake, i):
-		snakes.pop(i)
+		if i  == 1:
+			snake1.pop
+		if i  == 2:
+			snake2.pop
+		if i  == 3:
+			snake3.pop
+		if i  == 4:
+			snake4.pop
+		if i  == 5:
+			snake5.pop
 		ge.pop(i)
 		nets.pop(i)
 
-	def draw_grass(self):
+	def draw_grass():
 		grass_color = (167,209,61)
 		for row in range(cell_number):
 			if row % 2 == 0: 
@@ -175,8 +198,8 @@ def eval_genomes(genomes, config):
 						grass_rect = pygame.Rect(col * cell_size,row * cell_size,cell_size,cell_size)
 						pygame.draw.rect(screen,grass_color,grass_rect)			
 
-	def draw_score(self):
-		score_text = str(len(self.snake.body) - 3)
+	def draw_score():
+		score_text = str(len(snake.body) - 3)
 		score_surface = game_font.render(score_text,True,(56,74,12))
 		score_x = int(cell_size * cell_number - 60)
 		score_y = int(cell_size * cell_number - 40)
@@ -192,13 +215,7 @@ def eval_genomes(genomes, config):
 	SCREEN_UPDATE = pygame.USEREVENT
 	pygame.time.set_timer(SCREEN_UPDATE,150)
 
-	for genome_id, genome in genomes:
-		snakes.append(SNAKE())
-		fruits.append(FRUIT())
-		ge.append(genome)
-		net = neat.nn.FeedForwardNetwork.create(genome, config)
-		nets.append(net)
-		genome.fitness = 0
+	
 	
 	while True:
 		for event in pygame.event.get():
@@ -206,45 +223,49 @@ def eval_genomes(genomes, config):
 				pygame.quit()
 				sys.exit()
 			if event.type == SCREEN_UPDATE:
-				update()
+					update(snake1, fruit1, 1)
+					update(snake2, fruit2, 2)
+					update(snake3, fruit3, 3)
+					update(snake4, fruit4, 4)
+					update(snake5, fruit5, 5)
 			if len(snakes) == 0:
 				break
 			for i, snake in enumerate(snakes):
-				if event.type == SCREEN_UPDATE:
-					update(snake,  i)
-				output = net[i].activate(fruits(i).pos.x, fruits(i).pos.y)
+				
+				output = nets[i].activate((len(snake.body), (len(snake.body) - 3)))
 				if output[0] > 0.5:
 					if snake.direction.y != 1:
-						main_game.snake.direction = Vector2(0,-1)
+						snake.direction = Vector2(0,-1)
 				if output[1] > 0.5:
 					if snake.direction.x != -1:
-						main_game.snake.direction = Vector2(1,0)
+						snake.direction = Vector2(1,0)
 				if output[2] > 0.5:
 					if snake.direction.y != -1:
-						main_game.snake.direction = Vector2(0,1)
+						snake.direction = Vector2(0,1)
 				if output[3] > 0.5:
 					if snake.direction.x != 1:
-						main_game.snake.direction = Vector2(-1,0)
-				draw_elements(snake, fruits(i))
+						snake.direction = Vector2(-1,0)
+				for y, fruit in enumerate(fruits):
+					draw_elements(snake, fruit)
+					if event.type == SCREEN_UPDATE:
+						update(snake, fruit, i)
 		screen.fill((175,215,70))
-		
 		pygame.display.update()
 		clock.tick(100)
 
-def run(config_path):
-    global pop
-    config = neat.config.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_path
-    )
 
-    pop = neat.Population(config)
-    pop.run(eval_genomes, 10000)
 
-if __name__ == '__main__':
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config.txt')
-    run(config_path)
+
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config.txt')
+config = neat.config.Config(
+	neat.DefaultGenome,
+	neat.DefaultReproduction,
+	neat.DefaultSpeciesSet,
+	neat.DefaultStagnation,
+	config_path
+)
+
+pop = neat.Population(config)
+pop.run(eval_genomes, 10000000)
+print(pop)
