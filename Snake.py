@@ -25,7 +25,7 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 70
+snake_speed = 120
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
@@ -56,7 +56,9 @@ def distance(pos_a, pos_b):
     dy = pos_a[1]-pos_b[1]
     return math.sqrt(dx**2+dy**2)
 
-
+def truncate(n, decimals=0):
+    multiplier = 10 ** decimals
+    return int(n * multiplier) / multiplier
 
 score = 0
 def gameLoop(genomes, config, nets, i, ge, y):
@@ -65,6 +67,8 @@ def gameLoop(genomes, config, nets, i, ge, y):
     global score
     x1 = (dis_width / 2) + 5
     y1 = (dis_height / 2) + 5
+    prevx1 = (dis_width / 2) + 5
+    prevy1 = (dis_height / 2) + 5
  
     x1_change = 0
     y1_change = 0
@@ -73,7 +77,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
     Length_of_snake = 3
     score = 0
     x1_change = -snake_block
-
+    counter = 0
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
 
@@ -81,29 +85,15 @@ def gameLoop(genomes, config, nets, i, ge, y):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
-        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, foodx, foody, Length_of_snake, x1, y1, dis_height, dis_width))
-        if output[0] > 0.5:
-                if x1_change != snake_block:
-                        x1_change = -snake_block
-                        y1_change = 0
-        elif output[1] > 0.5:
-                if x1_change != -snake_block:
-                    x1_change = snake_block
-                    y1_change = 0
-        elif output[2] > 0.5:
-                if y1_change != snake_block:
-                    y1_change = -snake_block
-                    x1_change = 0
-        elif output[3] > 0.5:
-                if y1_change != -snake_block:
-                    y1_change = snake_block
-                    x1_change = 0
- 
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             ge[i].fitness -= 1
             game_close = True
-        x1 += x1_change
-        y1 += y1_change
+        if counter %2 == 0:
+                x1 += x1_change
+                y1 += y1_change
+        else:
+                prevx1 += x1_change
+                prevy1 += y1_change
         dis.fill(blue)
         l = 0
         while l <= dis_width/10:
@@ -123,13 +113,32 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 1
                 game_close = True
+        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, foodx, foody, Length_of_snake, x1, y1, dis_height, dis_width, dis_height))
+        if output[0] > 0.5:
+                if x1_change != snake_block:
+                        x1_change = -snake_block
+                        y1_change = 0
+        elif output[1] > 0.5:
+                if x1_change != -snake_block:
+                        x1_change = snake_block
+                        y1_change = 0
+        elif output[2] > 0.5:
+                if y1_change != snake_block:
+                        y1_change = -snake_block
+                        x1_change = 0
+        elif output[3] > 0.5:
+                if y1_change != -snake_block:
+                        y1_change = snake_block
+                        x1_change = 0
 
- 
+        if distance((x1, y1), (foodx, foody)) < distance((prevx1, prevy1), (foodx, foody)):
+                ge[i].fitness += 0.2
+                print("getting closer")
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 3, y)
  
         pygame.display.update()
- 
+        counter+= 1
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
@@ -138,7 +147,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
         if game_close == True:
                 score = Length_of_snake -3
                 break
- 
+                
 def eval_genomes(genomes, config):
         snakes = []
         ge = []
