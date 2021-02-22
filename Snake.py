@@ -25,6 +25,8 @@ clock = pygame.time.Clock()
 snake_block = 10
 snake_speed = 10
  
+apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
+
 font_style = pygame.font.SysFont("bahnschrift", 25)
 score_font = pygame.font.SysFont("comicsansms", 35)
  
@@ -46,9 +48,6 @@ def distance(pos_a, pos_b):
     dy = pos_a[1]-pos_b[1]
     return math.sqrt(dx**2+dy**2)
 
-def message(msg, color):
-    mesg = font_style.render(msg, True, color)
-    dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
 
 score = 0
@@ -57,8 +56,8 @@ def gameLoop(genomes, config, nets, i, ge, y):
     game_close = False
     global score
  
-    x1 = dis_width / 2
-    y1 = dis_height / 2
+    x1 = (dis_width / 2) + 5
+    y1 = (dis_height / 2) + 5
  
     x1_change = 0
     y1_change = 0
@@ -106,6 +105,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
                 pygame.draw.line(dis, black, ((dis_width / 25)*l, 0), ((dis_width / 25)*l, dis_height))
                 l+=1
         pygame.draw.rect(dis, red, [foodx, foody, snake_block, snake_block])
+        dis.blit(apple, (foodx -15, foody -15))
         snake_Head = []
         snake_Head.append(x1)
         snake_Head.append(y1)
