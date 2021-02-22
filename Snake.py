@@ -173,7 +173,7 @@ def eval_genomes(genomes, config):
         while y<= 10000000:
                 for i, snake in enumerate(snakes):
                         gameLoop(genomes, config, nets, i, ge,y)
-                        ge[i].fitness += score*7
+                        ge[i].fitness += score*2
                 y += 1
 
 
