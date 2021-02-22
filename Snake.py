@@ -25,7 +25,7 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 40
+snake_speed = 150
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
