@@ -44,7 +44,8 @@ def Your_score(score, y):
     value2 = font_style.render("Best Score: " + str(bestscore1), True, white)
     dis.blit(value2, [0, 230])
 
- 
+def find(lst, r):
+        return [i for i, x in enumerate(lst) if x == r]
  
  
 def our_snake(snake_block, snake_list):
@@ -74,7 +75,10 @@ def gameLoop(genomes, config, nets, i, ge, y):
  
     x1_change = 0
     y1_change = 0
+    location = []
+    amount = []
  
+
     snake_List = []
     Length_of_snake = 3
     score = 0
@@ -133,9 +137,14 @@ def gameLoop(genomes, config, nets, i, ge, y):
                 if y1_change != -snake_block:
                         y1_change = snake_block
                         x1_change = 0
-
-        # if distance((x1, y1), (foodx, foody)) < distance((prevx1, prevy1), (foodx, foody)):
-        #         ge[i].fitness += 0.2
+        location.append(distance((x1, y1), (foodx, foody)))
+        if len(location) > 50:
+                del location[0]
+        for r in location:
+                amount = find(location, r)
+                if len(amount) > 3:
+                        ge[i].fitness -= 1
+                        game_close = True
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 3, y)
         
