@@ -25,7 +25,7 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 14
+snake_speed = 40
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
@@ -78,7 +78,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
     snake_List = []
     Length_of_snake = 3
     score = 0
-    x1_change = -snake_block
+    #x1_change = -snake_block
     counter = 0
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
@@ -88,13 +88,12 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if event.type == pygame.QUIT:
                 game_over = True
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
-            ge[i].fitness -= 2
+            ge[i].fitness -= 1
             game_close = True
         x1 += x1_change
         y1 += y1_change
         if counter %2 == 0:
-                afterx1 += x1_change
-                aftery1 += y1_change
+                pass
         else:
                 prevx1 += x1_change
                 prevy1 += y1_change
@@ -115,31 +114,31 @@ def gameLoop(genomes, config, nets, i, ge, y):
  
         for x in snake_List[:-1]:
             if x == snake_Head:
-                ge[i].fitness -= 2
+                ge[i].fitness -= 1
                 game_close = True
-        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, foodx, foody, Length_of_snake, x1, y1, dis_height, dis_width, dis_height))
-        if output[0] > 0.5:
+        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, Length_of_snake, x1, y1, dis_height, dis_width, distance((prevx1, prevy1), (foodx, foody))))
+        if output[0] > 0.2:
                 if x1_change != snake_block:
                         x1_change = -snake_block
                         y1_change = 0
-        elif output[1] > 0.5:
+        elif output[1] > 0.2:
                 if x1_change != -snake_block:
                         x1_change = snake_block
                         y1_change = 0
-        elif output[2] > 0.5:
+        elif output[2] > 0.2:
                 if y1_change != snake_block:
                         y1_change = -snake_block
                         x1_change = 0
-        elif output[3] > 0.5:
+        elif output[3] > 0.2:
                 if y1_change != -snake_block:
                         y1_change = snake_block
                         x1_change = 0
 
-        if distance((x1, y1), (foodx, foody)) < distance((prevx1, prevy1), (foodx, foody)):
-                ge[i].fitness += 0.4
+        # if distance((x1, y1), (foodx, foody)) < distance((prevx1, prevy1), (foodx, foody)):
+        #         ge[i].fitness += 0.2
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 3, y)
- 
+        
         pygame.display.update()
         counter+= 1
         if x1 == foodx and y1 == foody:
@@ -165,7 +164,7 @@ def eval_genomes(genomes, config):
         while y<= 10000000:
                 for i, snake in enumerate(snakes):
                         gameLoop(genomes, config, nets, i, ge,y)
-                        ge[i].fitness += score*5
+                        ge[i].fitness += score*7
                 y += 1
 
 
