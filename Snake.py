@@ -17,6 +17,8 @@ blue = (50, 153, 213)
 dis_width = 250
 dis_height = 250
  
+bestscore1 = 0
+
 dis = pygame.display.set_mode((dis_width, dis_height))
 pygame.display.set_caption('Snake Game by Taren P')
  
@@ -27,15 +29,21 @@ snake_speed = 70
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
+font_style = pygame.font.SysFont("bahnschrift", 15)
+score_font = pygame.font.SysFont("comicsansms", 20)
  
  
 def Your_score(score, y):
+    global bestscore1
     value = score_font.render("Your Score: " + str(score), True, yellow)
     dis.blit(value, [0, 0])
-    text_2 = font_style.render("Generation:" + str(y + 1), True, white)
-    dis.blit(text_2, [0, 210])
+    if bestscore1 < score:
+        bestscore1 = score
+    value3 = font_style.render("Generation:" + str(y + 1), True, white)
+    dis.blit(value3, [0, 210])
+    value2 = font_style.render("Best Score: " + str(bestscore1), True, white)
+    dis.blit(value2, [0, 230])
+
  
  
  
@@ -55,7 +63,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
     game_over = False
     game_close = False
     global score
- 
     x1 = (dis_width / 2) + 5
     y1 = (dis_height / 2) + 5
  
@@ -98,7 +105,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
         x1 += x1_change
         y1 += y1_change
         dis.fill(blue)
-        widthForlines = []
         l = 0
         while l <= dis_width/10:
                 pygame.draw.line(dis, black, (0, (dis_height / 25)*l), (dis_width, (dis_height / 25)*l))
