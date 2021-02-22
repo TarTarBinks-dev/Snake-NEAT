@@ -68,10 +68,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
     global score
     x1 = (dis_width / 2) + 5
     y1 = (dis_height / 2) + 5
-    prevx1 = (dis_width / 2) + 5
-    prevy1 = (dis_height / 2) + 5
-    afterx1 = (dis_width / 2) + 5
-    aftery1 = (dis_height / 2) + 5
  
     x1_change = 0
     y1_change = 0
@@ -96,11 +92,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
             game_close = True
         x1 += x1_change
         y1 += y1_change
-        if counter %2 == 0:
-                pass
-        else:
-                prevx1 += x1_change
-                prevy1 += y1_change
         dis.fill(blue)
         l = 0
         while l <= dis_width/10:
