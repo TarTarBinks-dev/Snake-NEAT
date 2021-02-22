@@ -39,6 +39,8 @@ def remove(index):
 
 def Your_score(score, y):
     global bestscore1
+    text_1 = font_style.render(f'Snakes Alive:  {str(len(snakes))}', True, white)
+    dis.blit(text_1, [100, 210])
     value = score_font.render("Your Score: " + str(score), True, yellow)
     dis.blit(value, [0, 0])
     if bestscore1 < score:
