@@ -151,7 +151,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
         clock.tick(snake_speed)
         if game_close == True:
                 score = Length_of_snake -3
-                ge[i].fitness += score*4
+                ge[i].fitness += score*3
                 ge[i].fitness += 1
                 remove(i)
                 break
