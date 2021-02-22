@@ -14,8 +14,8 @@ red = (213, 50, 80)
 green = (0, 255, 0)
 blue = (50, 153, 213)
  
-dis_width = 250
-dis_height = 250
+dis_width = 230
+dis_height = 230
  
 bestscore1 = 0
 
@@ -40,9 +40,9 @@ def Your_score(score, y):
     if bestscore1 < score:
         bestscore1 = score
     value3 = font_style.render("Generation:" + str(y + 1), True, white)
-    dis.blit(value3, [0, 210])
+    dis.blit(value3, [0, 190])
     value2 = font_style.render("Best Score: " + str(bestscore1), True, white)
-    dis.blit(value2, [0, 230])
+    dis.blit(value2, [0, 210])
 
 def find(lst, r):
         return [i for i, x in enumerate(lst) if x == r]
@@ -79,7 +79,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
     Length_of_snake = 3
     score = 0
     #x1_change = -snake_block
-    counter = 0
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
 
@@ -95,8 +94,8 @@ def gameLoop(genomes, config, nets, i, ge, y):
         dis.fill(blue)
         l = 0
         while l <= dis_width/10:
-                pygame.draw.line(dis, black, (0, (dis_height / 25)*l), (dis_width, (dis_height / 25)*l))
-                pygame.draw.line(dis, black, ((dis_width / 25)*l, 0), ((dis_width / 25)*l, dis_height))
+                pygame.draw.line(dis, black, (0, (dis_height / 23)*l), (dis_width, (dis_height / 23)*l))
+                pygame.draw.line(dis, black, ((dis_width / 23)*l, 0), ((dis_width / 23)*l, dis_height))
                 l+=1
         pygame.draw.rect(dis, red, [foodx, foody, snake_block, snake_block])
         dis.blit(apple, (foodx-5, foody -5.7))
@@ -140,7 +139,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
         Your_score(Length_of_snake - 3, y)
         
         pygame.display.update()
-        counter+= 1
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
@@ -165,6 +163,7 @@ def eval_genomes(genomes, config):
                 for i, snake in enumerate(snakes):
                         gameLoop(genomes, config, nets, i, ge,y)
                         ge[i].fitness += score*2
+                        ge[i].fitness += 1
                 y += 1
 
 
