@@ -116,7 +116,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 1
                 game_close = True
-        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, Length_of_snake, x1, y1, dis_height, dis_width))
+        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, Length_of_snake, x1, y1, dis_height, dis_width, foodx, foody))
         if output[0] > 0.2:
                 if x1_change != snake_block:
                         x1_change = -snake_block
@@ -134,12 +134,12 @@ def gameLoop(genomes, config, nets, i, ge, y):
                         y1_change = snake_block
                         x1_change = 0
         location.append(distance((x1, y1), (foodx, foody)))
-        if len(location) > 50:
+        if len(location) > 100:
                 del location[0]
         for r in location:
                 amount = find(location, r)
                 print(amount)
-                if len(amount) > 3:
+                if len(amount) > 2:
                         ge[i].fitness -= 1
                         game_close = True
         our_snake(snake_block, snake_List)
