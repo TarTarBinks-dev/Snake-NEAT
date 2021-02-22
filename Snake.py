@@ -93,7 +93,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if event.type == pygame.QUIT:
                 game_over = True
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
-            ge[i].fitness -= 4
+            ge[i].fitness -= 2
             game_close = True
         x1 += x1_change
         y1 += y1_change
@@ -116,7 +116,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 2
                 game_close = True
-        output = nets[i].activate((distance((x1, y1), (foodx, foody)), Length_of_snake, x1, y1, dis_width, foodx, foody))
+        output = nets[i].activate((distance((x1 + 5, y1 + 5), (foodx + 5, foody +5)), Length_of_snake, x1 + 5, y1 + 5, dis_width, foodx + 5, foody + 5))
         if output[0] > 0.5:
                 if x1_change != snake_block:
                         x1_change = -snake_block
@@ -152,7 +152,8 @@ def gameLoop(genomes, config, nets, i, ge, y):
         counter += 1
         if game_close == True:
                 score = Length_of_snake -3
-                ge[i].fitness += score*3
+                if score >= 2:
+                        ge[i].fitness += score*3
                 remove(i)
                 break
                 
