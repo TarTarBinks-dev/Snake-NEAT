@@ -32,14 +32,18 @@ apple = pygame.transform.scale(apple, (20, 20))
 font_style = pygame.font.SysFont("bahnschrift", 15)
 score_font = pygame.font.SysFont("comicsansms", 20)
  
- 
+def remove(index):
+    snakes.pop(index)
+    ge.pop(index)
+    nets.pop(index)
+
 def Your_score(score, y):
     global bestscore1
     value = score_font.render("Your Score: " + str(score), True, yellow)
     dis.blit(value, [0, 0])
     if bestscore1 < score:
         bestscore1 = score
-    value3 = font_style.render("Generation:" + str(y + 1), True, white)
+    value3 = font_style.render(f'Generation:  {pop.generation+1}', True, white)
     dis.blit(value3, [0, 190])
     value2 = font_style.render("Best Score: " + str(bestscore1), True, white)
     dis.blit(value2, [0, 210])
@@ -127,14 +131,15 @@ def gameLoop(genomes, config, nets, i, ge, y):
                 if y1_change != -snake_block:
                         y1_change = snake_block
                         x1_change = 0
-        location.append(distance((x1, y1), (foodx, foody)))
-        if len(location) > 50:
-                del location[0]
-        for r in location:
-                amount = find(location, r)
-                if len(amount) > 3:
-                        ge[i].fitness -= 1
-                        game_close = True
+        # location.append(distance((x1, y1), (foodx, foody)))
+        # if len(location) > 1000:
+        #         del location[0]
+        # for r in location:
+        #         amount = find(location, r)
+        #         print(amount)
+        #         if len(amount) > 5:
+        #                 ge[i].fitness -= 1
+        #                 game_close = True
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 3, y)
         
@@ -146,9 +151,13 @@ def gameLoop(genomes, config, nets, i, ge, y):
         clock.tick(snake_speed)
         if game_close == True:
                 score = Length_of_snake -3
+                ge[i].fitness += score*3
+                ge[i].fitness += 1
+                remove(i)
                 break
                 
 def eval_genomes(genomes, config):
+        global snakes, ge, nets
         snakes = []
         ge = []
         nets = []
@@ -162,12 +171,10 @@ def eval_genomes(genomes, config):
         while y<= 10000000:
                 for i, snake in enumerate(snakes):
                         gameLoop(genomes, config, nets, i, ge,y)
-                        ge[i].fitness += score*2
-                        ge[i].fitness += 1
                 y += 1
 
-
 def run(config_path):
+    global pop
     config = neat.config.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
@@ -175,7 +182,7 @@ def run(config_path):
         neat.DefaultStagnation,
         config_path
     )
-    global pop
+
     pop = neat.Population(config)
     pop.run(eval_genomes, 10000000000)
 
