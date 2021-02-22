@@ -79,7 +79,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
     y1_change = 0
     location = []
     amount = []
- 
+    counter = 0
 
     snake_List = []
     Length_of_snake = 3
@@ -116,20 +116,20 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 1
                 game_close = True
-        output = nets[i].activate((distance((x1, y1), (foodx, foody)), score, Length_of_snake, x1, y1, dis_height, dis_width, foodx, foody))
-        if output[0] > 0.2:
+        output = nets[i].activate((distance((x1, y1), (foodx, foody)), Length_of_snake, x1, y1, dis_width, foodx, foody))
+        if output[0] > 0.5:
                 if x1_change != snake_block:
                         x1_change = -snake_block
                         y1_change = 0
-        elif output[1] > 0.2:
+        elif output[1] > 0.5:
                 if x1_change != -snake_block:
                         x1_change = snake_block
                         y1_change = 0
-        elif output[2] > 0.2:
+        elif output[2] > 0.5:
                 if y1_change != snake_block:
                         y1_change = -snake_block
                         x1_change = 0
-        elif output[3] > 0.2:
+        elif output[3] > 0.5:
                 if y1_change != -snake_block:
                         y1_change = snake_block
                         x1_change = 0
@@ -138,23 +138,23 @@ def gameLoop(genomes, config, nets, i, ge, y):
                 del location[0]
         for r in location:
                 amount = find(location, r)
-                print(amount)
                 if len(amount) > 2:
                         ge[i].fitness -= 1
                         game_close = True
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 3, y)
-        
+        if counter %2 == 0:
+                ge[i].fitness += 0.02
         pygame.display.update()
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
         clock.tick(snake_speed)
+        counter += 1
         if game_close == True:
                 score = Length_of_snake -3
                 ge[i].fitness += score*3
-                ge[i].fitness += 1
                 remove(i)
                 break
                 
