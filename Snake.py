@@ -132,12 +132,12 @@ def gameLoop(genomes, config, nets, i, ge, y):
                         y1_change = snake_block
                         x1_change = 0
         location.append(distance((x1, y1), (foodx, foody)))
-        if len(location) > 1000:
+        if len(location) > 50:
                 del location[0]
         for r in location:
                 amount = find(location, r)
                 print(amount)
-                if len(amount) > 5:
+                if len(amount) > 3:
                         ge[i].fitness -= 1
                         game_close = True
         our_snake(snake_block, snake_List)
@@ -151,7 +151,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
         clock.tick(snake_speed)
         if game_close == True:
                 score = Length_of_snake -3
-                ge[i].fitness += score*3
+                ge[i].fitness += score*4
                 ge[i].fitness += 1
                 remove(i)
                 break
