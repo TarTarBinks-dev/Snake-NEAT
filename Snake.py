@@ -23,10 +23,10 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 10
+snake_speed = 70
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
-
+apple = pygame.transform.scale(apple, (20, 20))
 font_style = pygame.font.SysFont("bahnschrift", 25)
 score_font = pygame.font.SysFont("comicsansms", 35)
  
@@ -105,7 +105,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
                 pygame.draw.line(dis, black, ((dis_width / 25)*l, 0), ((dis_width / 25)*l, dis_height))
                 l+=1
         pygame.draw.rect(dis, red, [foodx, foody, snake_block, snake_block])
-        dis.blit(apple, (foodx -15, foody -15))
+        dis.blit(apple, (foodx-5, foody -5.7))
         snake_Head = []
         snake_Head.append(x1)
         snake_Head.append(y1)
