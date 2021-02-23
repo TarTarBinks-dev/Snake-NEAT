@@ -25,7 +25,7 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 20
+snake_speed = 150
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
@@ -152,8 +152,8 @@ def gameLoop(genomes, config, nets, i, ge, y):
         counter += 1
         if game_close == True:
                 score = Length_of_snake -3
-                if score >= 2:
-                        ge[i].fitness += score*3
+                ge[i].fitness += score
+                print(ge[i].fitness)
                 remove(i)
                 break
                 
