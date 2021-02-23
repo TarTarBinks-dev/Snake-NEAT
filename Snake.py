@@ -25,7 +25,7 @@ pygame.display.set_caption('Snake Game by Taren P')
 clock = pygame.time.Clock()
  
 snake_block = 10
-snake_speed = 150
+snake_speed = 20
  
 apple = pygame.image.load(os.path.join("Graphics", "apple.png"))
 apple = pygame.transform.scale(apple, (20, 20))
@@ -116,7 +116,7 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 2
                 game_close = True
-        output = nets[i].activate((distance((x1 + 5, y1 + 5), (foodx + 5, foody +5)), Length_of_snake, x1 + 5, y1 + 5, dis_width, foodx + 5, foody + 5))
+        output = nets[i].activate((distance((x1 + 5, y1 + 5), (foodx + 5, foody +5)), distance((x1, y1), (0, dis_height/2)), distance((x1, y1), (dis_width/2, 0)), distance((x1, y1), (dis_width, dis_height/2)), distance((x1, y1), (dis_width/2, dis_height)), x1_change, y1_change, Length_of_snake, x1 + 5, y1 + 5, dis_width, foodx + 5, foody + 5))
         if output[0] > 0.5:
                 if x1_change != snake_block:
                         x1_change = -snake_block
@@ -149,8 +149,6 @@ def gameLoop(genomes, config, nets, i, ge, y):
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
         clock.tick(snake_speed)
-        if counter > 20:
-                ge[i].fitness += .5
         counter += 1
         if game_close == True:
                 score = Length_of_snake -3
