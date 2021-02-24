@@ -148,8 +148,8 @@ def gameLoop(genomes, config, i, y):
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
-        if counter > 15:
-            ge[i] += 0.2
+        if counter > 12:
+            ge[i] += 0.3
         clock.tick(snake_speed)
         if game_close == True:
                 score = Length_of_snake -3
