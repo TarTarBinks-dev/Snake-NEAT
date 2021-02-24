@@ -99,6 +99,12 @@ def gameLoop(genomes, config, nets, i, ge, y):
         y1 += y1_change
         dis.fill(blue)
         l = 0
+        if foody == (dis_width/2) + 5:
+            foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+            print("relocating")
+        if foodx == (dis_height/2) + 5:
+            foodx = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+            print("relocating")
         while l <= dis_width/10:
                 pygame.draw.line(dis, black, (0, (dis_height / 23)*l), (dis_width, (dis_height / 23)*l))
                 pygame.draw.line(dis, black, ((dis_width / 23)*l, 0), ((dis_width / 23)*l, dis_height))
@@ -116,23 +122,19 @@ def gameLoop(genomes, config, nets, i, ge, y):
             if x == snake_Head:
                 ge[i].fitness -= 2
                 game_close = True
-        output = nets[i].activate((distance((x1 + 5, y1 + 5), (foodx + 5, foody +5)), distance((x1, y1), (0, dis_height/2)), distance((x1, y1), (dis_width/2, 0)), distance((x1, y1), (dis_width, dis_height/2)), distance((x1, y1), (dis_width/2, dis_height)), x1_change, y1_change, Length_of_snake, x1 + 5, y1 + 5, dis_width, foodx + 5, foody + 5))
+        output = nets[i].activate((distance((x1, y1), (foodx, foody)), Length_of_snake, x1, y1, dis_width, foodx, foody))
         if output[0] > 0.5:
-                if x1_change != snake_block:
-                        x1_change = -snake_block
-                        y1_change = 0
-        elif output[1] > 0.5:
-                if x1_change != -snake_block:
-                        x1_change = snake_block
-                        y1_change = 0
-        elif output[2] > 0.5:
-                if y1_change != snake_block:
-                        y1_change = -snake_block
-                        x1_change = 0
-        elif output[3] > 0.5:
-                if y1_change != -snake_block:
-                        y1_change = snake_block
-                        x1_change = 0
+                    x1_change = -snake_block
+                    y1_change = 0
+        if output[1] > 0.5:
+                    x1_change = snake_block
+                    y1_change = 0
+        if output[2] > 0.5:
+                    y1_change = -snake_block
+                    x1_change = 0
+        if output[3] > 0.5:
+                    y1_change = snake_block
+                    x1_change = 0
         location.append(distance((x1, y1), (foodx, foody)))
         if len(location) > 100:
                 del location[0]
@@ -148,12 +150,13 @@ def gameLoop(genomes, config, nets, i, ge, y):
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
+        # if counter > 15:
+        #     ge[i] += 0.2
         clock.tick(snake_speed)
-        counter += 1
         if game_close == True:
                 score = Length_of_snake -3
-                ge[i].fitness += score
-                print(ge[i].fitness)
+                ge[i].fitness += score*3
+                # print(ge[i].fitness)
                 remove(i)
                 break
                 
