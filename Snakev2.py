@@ -4,6 +4,7 @@ import pygame
 import time
 import os
 import neat
+import math
  
 white = (255, 255, 255)
 yellow = (255, 255, 102)
@@ -152,7 +153,7 @@ def eval_genomes(genomes, config):
         while(_running ):
             Your_score(player.length - 3)
             pygame.event.pump()
-            output = nets[i].activate((distance((player.x, player.y), (apple.x, apple.y)), player.length, player.x, player.y, windowHeight, apple.x, apple.y))
+            output = nets[i].activate((distance((player.x[0], player.y[0]), (apple.x, apple.y)), player.length, player.x, player.y, windowHeight, apple.x, apple.y))
             if output[0] > 0.5:
                 player.moveRight()
 
