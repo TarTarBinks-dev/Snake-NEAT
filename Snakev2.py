@@ -3,6 +3,7 @@ from random import randint
 import pygame
 import time
 import os
+import neat
  
 class Apple:
     x = 0
@@ -137,7 +138,7 @@ def on_render(player):
 def on_cleanup():
     pygame.quit()
 
-def on_execute():
+def eval_genomes():
     global _running
     while(_running ):
         pygame.event.pump()
@@ -164,5 +165,21 @@ def on_execute():
         time.sleep (50.0 / 1000.0)
     on_cleanup()
 
-if __name__ == "__main__" :
-    on_execute()
+def run(config_path):
+    global pop
+    config = neat.config.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_path
+    )
+
+    pop = neat.Population(config)
+    pop.run(eval_genomes, 10000000000)
+
+
+if __name__ == '__main__':
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config.txt')
+    run(config_path)
