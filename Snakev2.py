@@ -5,6 +5,25 @@ import time
 import os
 import neat
  
+white = (255, 255, 255)
+yellow = (255, 255, 102)
+black = (0, 0, 0)
+red = (213, 50, 80)
+green = (0, 255, 0)
+blue = (50, 153, 213)
+windowWidth = 800
+windowHeight = 600
+bestscore1 = 0
+
+pygame.init()
+_display_surf = pygame.display.set_mode((windowWidth,windowHeight), pygame.HWSURFACE)
+
+font_style = pygame.font.SysFont("bahnschrift", 15)
+score_font = pygame.font.SysFont("comicsansms", 20)
+pygame.display.set_caption('Game by Taren P')
+_running = True
+_image_surf = pygame.image.load(os.path.join("Graphics", "gold2.png"))
+_apple_surf = pygame.image.load(os.path.join("Graphics", "apple2.png"))
 class Apple:
     x = 0
     y = 0
@@ -83,27 +102,8 @@ class Game:
             if y1 >= y2 and y1 <= y2 + bsize:
                 return True
         return False
- 
-
-windowWidth = 800
-windowHeight = 600
-
 game = Game()
-player = Player(3) 
 apple = Apple(5,5)
-
-snakes = []
-ge = []
-nets = []
-
-pygame.init()
-_display_surf = pygame.display.set_mode((windowWidth,windowHeight), pygame.HWSURFACE)
-
-pygame.display.set_caption('Pygame pythonspot.com example')
-_running = True
-_image_surf = pygame.image.load(os.path.join("Graphics", "gold2.png"))
-_apple_surf = pygame.image.load(os.path.join("Graphics", "apple2.png"))
-
 def on_event(event):
     if event.type == QUIT:
         self._running = False
@@ -138,31 +138,51 @@ def on_render(player):
 def on_cleanup():
     pygame.quit()
 
-def eval_genomes():
-    global _running
-    while(_running ):
-        pygame.event.pump()
-        keys = pygame.key.get_pressed() 
+def Your_score(score):
+    global bestscore1
+    text_1 = font_style.render(f'Snakes Alive:  {str(len(snakes))}', True, white)
+    _display_surf.blit(text_1, [100, 210])
+    value = score_font.render("Your Score: " + str(score), True, yellow)
+    _display_surf.blit(value, [0, 0])
+    if bestscore1 < score:
+        bestscore1 = score
+    value3 = font_style.render(f'Generation:  {pop.generation+1}', True, white)
+    _display_surf.blit(value3, [0, 190])
+    value2 = font_style.render("Best Score: " + str(bestscore1), True, white)
+    _display_surf.blit(value2, [0, 210])
+def eval_genomes(genomes, config):
+    global _running, snakes, ge, nets
+    snakes = []
+    ge = []
+    nets = []
+    for genome_id, genome in genomes:
+        snakes.append(Player(3))
+        ge.append(genome)
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        nets.append(net)
+        genome.fitness = 0
+    for i, player in enumerate(snakes):
+        while(_running ):
+            Your_score(player.length - 3)
+            pygame.event.pump()
+            keys = pygame.key.get_pressed() 
 
-        if (keys[K_RIGHT]):
-            player.moveRight()
+            if (keys[K_RIGHT]):
+                player.moveRight()
 
-        if (keys[K_LEFT]):
-            player.moveLeft()
+            if (keys[K_LEFT]):
+                player.moveLeft()
 
-        if (keys[K_UP]):
-            player.moveUp()
+            if (keys[K_UP]):
+                player.moveUp()
 
-        if (keys[K_DOWN]):
-            player.moveDown()
+            if (keys[K_DOWN]):
+                player.moveDown()
 
-        if (keys[K_ESCAPE]):
-            _running = False
+            on_loop(player, apple)
+            on_render(player)
 
-        on_loop(player, apple)
-        on_render()
-
-        time.sleep (50.0 / 1000.0)
+            time.sleep (50.0 / 1000.0)
     on_cleanup()
 
 def run(config_path):
