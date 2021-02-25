@@ -91,14 +91,17 @@ game = Game()
 player = Player(3) 
 apple = Apple(5,5)
 
+snakes = []
+ge = []
+nets = []
 
 pygame.init()
 _display_surf = pygame.display.set_mode((windowWidth,windowHeight), pygame.HWSURFACE)
 
 pygame.display.set_caption('Pygame pythonspot.com example')
 _running = True
-_image_surf = pygame.image.load(os.path.join("Graphics", "Gold_Block.png"))
-_apple_surf = pygame.image.load(os.path.join("Graphics", "apple.png"))
+_image_surf = pygame.image.load(os.path.join("Graphics", "gold2.png"))
+_apple_surf = pygame.image.load(os.path.join("Graphics", "apple2.png"))
 
 def on_event(event):
     if event.type == QUIT:
@@ -109,7 +112,7 @@ def on_loop(player, apple):
 
     # does snake eat apple?
     for i in range(0,player.length):
-        if game.isCollision(apple.x,apple.y,player.x[i], player.y[i],44):
+        if apple.x == player.x[i] and apple.y == player.y[i]:
             apple.x = randint(2,9) * 44
             apple.y = randint(2,9) * 44
             player.length = player.length + 1
@@ -125,7 +128,7 @@ def on_loop(player, apple):
 
     pass
 
-def on_render():
+def on_render(player):
     _display_surf.fill((0,0,0))
     player.draw(_display_surf, _image_surf)
     apple.draw(_display_surf, _apple_surf)
