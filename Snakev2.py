@@ -108,36 +108,22 @@ def on_event(event):
     if event.type == QUIT:
         self._running = False
 
-def on_loop(player, apple):
-    player.update()
-
-    # does snake eat apple?
-    for i in range(0,player.length):
-        if apple.x == player.x[i] and apple.y == player.y[i]:
-            apple.x = randint(2,9) * 44
-            apple.y = randint(2,9) * 44
-            player.length = player.length + 1
-
-
-    # does snake collide with itself?
-    for i in range(2, player.length):
-        if game.isCollision(player.x[0],player.y[0],player.x[i], player.y[i],40):
-            print("You lose! Collision: ")
-            print("x[0] (" + str(player.x[0]) + "," + str(player.y[0]) + ")")
-            print("x[" + str(i) + "] (" + str(player.x[i]) + "," + str(player.y[i]) + ")")
-            exit(0)
-
-    pass
 
 def on_render(player):
     _display_surf.fill((0,0,0))
     player.draw(_display_surf, _image_surf)
     apple.draw(_display_surf, _apple_surf)
     pygame.display.flip()
-
+def distance(pos_a, pos_b):
+    dx = pos_a[0]-pos_b[0]
+    dy = pos_a[1]-pos_b[1]
+    return math.sqrt(dx**2+dy**2)
 def on_cleanup():
     pygame.quit()
-
+def remove(index):
+    snakes.pop(index)
+    ge.pop(index)
+    nets.pop(index)
 def Your_score(score):
     global bestscore1
     text_1 = font_style.render(f'Snakes Alive:  {str(len(snakes))}', True, white)
@@ -162,25 +148,43 @@ def eval_genomes(genomes, config):
         nets.append(net)
         genome.fitness = 0
     for i, player in enumerate(snakes):
+        escape = False
         while(_running ):
             Your_score(player.length - 3)
             pygame.event.pump()
-            keys = pygame.key.get_pressed() 
-
-            if (keys[K_RIGHT]):
+            output = nets[i].activate((distance((player.x, player.y), (apple.x, apple.y)), player.length, player.x, player.y, windowHeight, apple.x, apple.y))
+            if output[0] > 0.5:
                 player.moveRight()
 
-            if (keys[K_LEFT]):
+            if output[1] > 0.5:
                 player.moveLeft()
 
-            if (keys[K_UP]):
+            if output[2] > 0.5:
                 player.moveUp()
 
-            if (keys[K_DOWN]):
+            if output[3] > 0.5:
                 player.moveDown()
 
-            on_loop(player, apple)
+            player.update()
+
+            # does snake eat apple?
+            for i in range(0,player.length):
+                if apple.x == player.x[i] and apple.y == player.y[i]:
+                    apple.x = randint(2,9) * 44
+                    apple.y = randint(2,9) * 44
+                    player.length = player.length + 1
+                    ge[i].fitness += 2
+
+
+            # does snake collide with itself?
+            for i in range(2, player.length):
+                if game.isCollision(player.x[0],player.y[0],player.x[i], player.y[i],40):
+                    ge[i].fitness -= 1
+                    remove(i)
+                    escape = True
             on_render(player)
+            if escape == True:
+                break
 
             time.sleep (50.0 / 1000.0)
     on_cleanup()
